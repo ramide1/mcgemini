@@ -1,0 +1,11 @@
+main: com.ramide1.mcgemini.App
+name: mcgemini
+version: 1.0
+api-version: 1.20
+commands:
+  gemini:
+    description: Answer a question with gemini
+    permission: mcgemini.gemini
+  geminireload:
+    description: Reload gemini config
+    permission: mcgemini.geminireload
