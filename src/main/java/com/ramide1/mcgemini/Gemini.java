@@ -36,7 +36,8 @@ public class Gemini implements CommandExecutor {
             }
             String newHistory = messages;
             if (!instructions.isEmpty()) {
-                messages = "{\"role\": \"user\",\"parts\": [" + "{\"text\": \"" + instructions + "\"}" + "]}" + "," + "{\"role\": \"model\",\"parts\": [" + "{\"text\": \"Ok.\"}" + "]}" + "," + messages;
+                messages = "{\"role\": \"user\",\"parts\": [" + "{\"text\": \"" + instructions + "\"}" + "]}" + ","
+                        + "{\"role\": \"model\",\"parts\": [" + "{\"text\": \"Ok.\"}" + "]}" + "," + messages;
             }
             messages = "[" + messages + "]";
             String data = "{\"contents\": " + messages + "}";
@@ -57,6 +58,7 @@ public class Gemini implements CommandExecutor {
                 Matcher matcher = pattern.matcher(response.toString());
                 if (matcher.find()) {
                     content = matcher.group(1);
+                    content = content.replace("\n", " ");
                     newHistory = newHistory + "," + "{\"role\": \"model\",\"parts\": [" + "{\"text\": \"" + content
                             + "\"}" + "]}";
                     saveHistory(sender, newHistory);
@@ -71,15 +73,20 @@ public class Gemini implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command gemini, String label, String[] args) {
         String instructions = plugin.getConfig().getString("Config.instructions", "");
-        String apiKey = plugin.getConfig().getString("Config.apikey", "");
+        String apikey = plugin.getConfig().getString("Config.apikey", "");
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (args.length >= 1) {
+                StringBuilder question = new StringBuilder();
+                for (String arg : args) {
+                    question.append(arg).append(" ");
+                }
+                question.deleteCharAt(question.length() - 1);
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        String response = sendRequestToGeminiApi(instructions, player.getName(), String.join(" ", args),
-                                apiKey);
+                        String response = sendRequestToGeminiApi(instructions, player.getName(), question.toString(),
+                                apikey);
                         Bukkit.getScheduler().runTask(plugin, () -> player.sendMessage(response));
                     }
                 }.runTaskAsynchronously(plugin);
@@ -88,11 +95,16 @@ public class Gemini implements CommandExecutor {
             }
         } else {
             if (args.length >= 1) {
+                StringBuilder question = new StringBuilder();
+                for (String arg : args) {
+                    question.append(arg).append(" ");
+                }
+                question.deleteCharAt(question.length() - 1);
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        String response = sendRequestToGeminiApi(instructions, "console", String.join(" ", args),
-                                apiKey);
+                        String response = sendRequestToGeminiApi(instructions, "console", question.toString(),
+                                apikey);
                         Bukkit.getScheduler().runTask(plugin, () -> plugin.getLogger().info(response));
                     }
                 }.runTaskAsynchronously(plugin);
