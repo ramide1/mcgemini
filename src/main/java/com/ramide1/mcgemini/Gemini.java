@@ -57,7 +57,7 @@ public class Gemini implements CommandExecutor {
                 Pattern pattern = Pattern.compile(regex);
                 Matcher matcher = pattern.matcher(response.toString());
                 if (matcher.find()) {
-                    content = matcher.group(1);
+                    content = (matcher.group(1)).replaceAll("\n", "");
                     newHistory = newHistory + "," + "{\"role\": \"model\",\"parts\": [" + "{\"text\": \"" + content
                             + "\"}" + "]}";
                     saveHistory(sender, newHistory);
