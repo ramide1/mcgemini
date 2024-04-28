@@ -22,7 +22,7 @@ public class Gemini implements CommandExecutor {
         this.plugin = plugin;
     }
 
-    public String sendRequestToGeminiApi(String instructions, String sender, String question, String apikey) {
+    private String sendRequestToGeminiApi(String instructions, String sender, String question, String apikey) {
         String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + apikey;
         String content = "Response was not ok.";
         try {
@@ -57,7 +57,7 @@ public class Gemini implements CommandExecutor {
                 Pattern pattern = Pattern.compile(regex);
                 Matcher matcher = pattern.matcher(response.toString());
                 if (matcher.find()) {
-                    content = matcher.group(1).replace("\\n", "\n");
+                    content = matcher.group(1).replace("\\n", "").replace("\\", "");
                     newHistory = newHistory + "," + "{\"role\": \"model\",\"parts\": [" + "{\"text\": \"" + content
                             + "\"}" + "]}";
                     saveHistory(sender, newHistory);
@@ -114,7 +114,7 @@ public class Gemini implements CommandExecutor {
         return true;
     }
 
-    public boolean saveHistory(String sender, String history) {
+    private boolean saveHistory(String sender, String history) {
         plugin.dataConfig.set(sender, history);
         try {
             plugin.dataConfig.save(plugin.data);
@@ -124,7 +124,7 @@ public class Gemini implements CommandExecutor {
         return true;
     }
 
-    public String getHistory(String sender) {
+    private String getHistory(String sender) {
         return plugin.dataConfig.contains(sender) ? plugin.dataConfig.getString(sender) : "";
     }
 }
