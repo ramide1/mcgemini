@@ -1,3 +1,4 @@
 Config:
   instructions: ""
   apikey: ""
+  model: "gemini-1.5-flash-latest"

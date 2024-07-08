@@ -22,8 +22,10 @@ public class Gemini implements CommandExecutor {
         this.plugin = plugin;
     }
 
-    private String sendRequestToGeminiApi(String instructions, String sender, String question, String apikey) {
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + apikey;
+    private String sendRequestToGeminiApi(String instructions, String sender, String question, String apikey,
+            String model) {
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key="
+                + apikey;
         String content = "Response was not ok.";
         try {
             HttpURLConnection connection = (HttpURLConnection) new URI(url).toURL().openConnection();
@@ -73,6 +75,7 @@ public class Gemini implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command gemini, String label, String[] args) {
         String instructions = plugin.getConfig().getString("Config.instructions", "");
         String apikey = plugin.getConfig().getString("Config.apikey", "");
+        String model = plugin.getConfig().getString("Config.model", "gemini-1.5-flash-latest");
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (args.length >= 1) {
@@ -85,7 +88,7 @@ public class Gemini implements CommandExecutor {
                     @Override
                     public void run() {
                         String response = sendRequestToGeminiApi(instructions, player.getName(), question.toString(),
-                                apikey);
+                                apikey, model);
                         Bukkit.getScheduler().runTask(plugin, () -> player.sendMessage(response));
                     }
                 }.runTaskAsynchronously(plugin);
@@ -103,7 +106,7 @@ public class Gemini implements CommandExecutor {
                     @Override
                     public void run() {
                         String response = sendRequestToGeminiApi(instructions, "console", question.toString(),
-                                apikey);
+                                apikey, model);
                         Bukkit.getScheduler().runTask(plugin, () -> plugin.getLogger().info(response));
                     }
                 }.runTaskAsynchronously(plugin);
