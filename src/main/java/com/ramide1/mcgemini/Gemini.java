@@ -55,11 +55,11 @@ public class Gemini implements CommandExecutor {
                 while ((line = br.readLine()) != null) {
                     response.append(line);
                 }
-                String regex = "\"candidates\"\\s*:\\s*\\[\\s*\\{\\s*\"content\"\\s*:\\s*\\{\\s*\"parts\"\\s*:\\s*\\[\\s*\\{\\s*\"text\"\\s*:\\s*\"([^\"]+)\"";
+                String regex = "\"candidates\"\\s*:\\s*\\[\\s*\\{\\s*\"content\"\\s*:\\s*\\{\\s*\"parts\"\\s*:\\s*\\[\\s*\\{\\s*\"text\"\\s*:\\s*\"((?:\\\\\"|[^\"])*)\"";
                 Pattern pattern = Pattern.compile(regex);
                 Matcher matcher = pattern.matcher(response.toString());
                 if (matcher.find()) {
-                    content = matcher.group(1).replace("\\n", " ").replace("\\", " ");
+                    content = matcher.group(1).replace("\\n", "").replace("\\", "").replace("\"", "");
                     newHistory = newHistory + "," + "{\"role\": \"model\",\"parts\": [" + "{\"text\": \"" + content
                             + "\"}" + "]}";
                     saveHistory(sender, newHistory);
